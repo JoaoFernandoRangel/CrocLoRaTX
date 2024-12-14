@@ -2,32 +2,44 @@
 #include <SPI.h>
 #include <LoRa.h>
 
+void sendString(String send);
+
 unsigned long t[5];
 uint16_t counter;
 
-void setup() {
+void setup()
+{
   Serial.begin(9600);
-  while (!Serial);
+  while (!Serial)
+    ;
 
   Serial.println("LoRa Sender");
 
-  if (!LoRa.begin(915E6)) {
+  if (!LoRa.begin(915E6))
+  {
     Serial.println("Starting LoRa failed!");
-    while (1);
+    while (1)
+      ;
   }
 }
 
-void loop() {
+void loop()
+{
+  String sender = "Sending packet: ";
   Serial.print("Sending packet: ");
   Serial.println(counter);
 
-  // send packet
-  LoRa.beginPacket();
-  LoRa.print("hello ");
-  LoRa.print(counter);
-  LoRa.endPacket();
+
+  sendString(sender + String(counter));
 
   counter++;
 
   delay(5000);
+}
+
+void sendString(String send)
+{
+  LoRa.beginPacket();
+  LoRa.print(send.c_str());
+  LoRa.endPacket();
 }
