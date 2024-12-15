@@ -5,8 +5,13 @@
 #define PotPin A4
 #define noiseThrs 25
 #define idMAX 5
+#define trigPin DD5
+#define echoPin DD6
+
+
 void sendString(String send);
 bool handleAnalogRead(uint8_t pin, int &pot, int noise);
+void readLevel(unsigned long &t, float &distOld);
 
 unsigned long t[5];
 uint16_t counter;
@@ -66,4 +71,26 @@ void sendString(String send) {
     LoRa.beginPacket();
     LoRa.print(send.c_str());
     LoRa.endPacket();
+}
+
+void readLevel(unsigned long &t, float &distOld) {
+    unsigned long dur;
+    float distNew;
+    if (millis() - t > 5000) {
+        // Clears the trigPin condition
+        digitalWrite(trigPin, LOW);
+        delayMicroseconds(2);
+        // Sets the trigPin HIGH (ACTIVE) for 1500 microseconds
+        digitalWrite(trigPin, HIGH);
+        delayMicroseconds(1500);
+        digitalWrite(trigPin, LOW);
+        // Reads the echoPin, returns the sound wave travel time in microseconds
+        dur = pulseIn(echoPin, HIGH);
+        // Calculating the distance
+        distNew = dur * 0.034 / 2;  // Speed of sound wave divided by 2 (go and back)
+        if (distNew != distOld) {
+            distOld = distNew;
+        }
+        t = millis();
+    }
 }
