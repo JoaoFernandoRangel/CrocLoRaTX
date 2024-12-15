@@ -8,7 +8,6 @@
 #define trigPin DD5
 #define echoPin DD6
 
-
 void sendString(String send);
 bool handleAnalogRead(uint8_t pin, int &pot, int noise);
 void readLevel(unsigned long &t, float &distOld);
@@ -56,6 +55,18 @@ void loop() {
         t[0] = millis();
     }
 }
+
+String buildPayload(float *leituras, int size) {
+    String ret;
+    if (leituras == nullptr || size <= 0) {
+        return "";
+    }
+    for (int i = 0; i < size; i++) {
+        ret += "id" + String(i) + "_" + String(leituras[i],2) + ";";
+    }
+    return ret;
+}
+
 
 bool handleAnalogRead(uint8_t pin, int &pot, int noise) {
     int read1 = analogRead(pin);
